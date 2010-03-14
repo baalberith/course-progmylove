@@ -1,3 +1,10 @@
+% zadanie 1
+
+select(E, X, Y) :-
+    append(X1, [E|X2], X),
+    append(X1, X2, Y).
+
+
 % zadanie 2
 
 even([]). 
@@ -19,6 +26,7 @@ palindrom(X) :-
     
 singleton([_]).
 
+
 % zadanie 3
 
 head(H, [H|_]).
@@ -37,10 +45,17 @@ prefix([], _).
 prefix([H|T], [H|L]) :- 
     prefix(T, L).
     
+prefix(P, L) :-
+    append(P, _, L).
+    
 suffix(L, L).
 suffix([_|T], L) :- 
     suffix(T, L).
     
+suffix(L, S) :-
+    append(_, S, L).
+
+
 % zadanie 4
     
 sublist([],[]). 
@@ -48,14 +63,16 @@ sublist([H|T1],[H|T2]):-
     sublist(T1,T2). 
 sublist([_|T1],T2):- 
     sublist(T1,T2). 
-    
+
+
 % zadanie 5
 
 permutation1([], []).
 permutation1(L1, [X|L3]) :-
     select(X, L1, L2),
     permutation1(L2, L3).
-    
+
+
 % zadanie 6
 
 permutation2([], []).

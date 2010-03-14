@@ -3,6 +3,7 @@
 man(socrates).
 is_mortal(X) :- man(X).
 
+
 % zadanie 3
 
 parent(adam, helen).
@@ -36,6 +37,7 @@ descendant(X, Y) :- parent(Z, X), descendant(Z, Y).
 is_mother(X) :- female(X), parent(X, _).
 is_father(X) :- male(X), parent(X, _).
 
+
 % zadanie 4
 
 connect(wroclaw, warszawa).
@@ -59,11 +61,13 @@ connection(X, Y) :- connect(X, Z), connection(Z, Y).
 destination(X, X).
 destination(X, Y) :- connect(X, Z), destination(Z, Y).
 
+
 % zadanie 5
 
 append([], X, X).
 append([H|T], X, [H|Y]) :-
    append(T, X, Y).
+
 
 % zadanie 6
 
