@@ -127,3 +127,38 @@ reverse(X, Y) :- reverse(X, [], Y, Y).
 reverse([], A, A, []). 
 reverse([X|Xs], A, Y, [_|Ls]) :- 
     reverse(Xs, [X|A], Y, Ls).
+    
+    
+% zadanie 6
+    
+same_length([], []). 
+same_length([_|T1], [_|T2]) :- same_length(T1, T2). 
+
+perms([], []). 
+perms(L, [E|PR]) :- 
+    same_length(L, [E|PR]), 
+    select(L, E, R), 
+    perms(R, PR). 
+
+permi([], []). 
+permi([H|T], P) :- 
+    same_length([H|T], P), 
+    permi(T, PT), 
+    select(P, H, PT).
+    
+perm_sel(_, _, [], []). 
+perm_sel([X|Xs], Y, [_|L], [_|R]) :- 
+    perm_sel([X|Xs], Y, L, R), 
+    select(X, Y, Z), 
+    perm_sel(Xs, Z, L, R). 
+perm_sel(X, Y) :- 
+    perm_sel(X, Y, X, Y). 
+
+perm_ins(_, _, [], []). 
+perm_ins([X|Xs], Y, [_|L], [_|R]) :- 
+    perm_ins([X|Xs], Y, L, R), 
+    perm_ins(Xs, Z), 
+    select(X, Y, Z). 
+perm_ins(X, Y) :- 
+    perm_ins(X, Y, X, Y). 
+    
