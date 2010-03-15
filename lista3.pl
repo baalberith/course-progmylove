@@ -123,42 +123,29 @@ ins_sort([H|T], R) :-
     
 % zadanie 5
 
-reverse(X, Y) :- reverse(X, [], Y, Y). 
-reverse([], A, A, []). 
-reverse([X|Xs], A, Y, [_|Ls]) :- 
-    reverse(Xs, [X|A], Y, Ls).
+% reverse(?List, ?Rev)
+
+reverse1([], [], []).
+reverse1([H|T], S, [_|Ss]) :-
+    reverse1(T, R, Ss),
+    append(R, [H], S).
+reverse1(X, Y) :-
+    reverse1(X, Y, Y).
+
+reverse2([], A, A, []). 
+reverse2([X|Xs], A, Y, [_|Ls]) :- 
+    reverse2(Xs, [X|A], Y, Ls).
+reverse2(X, Y) :- 
+    reverse2(X, [], Y, Y).    
     
     
 % zadanie 6
-    
-same_length([], []). 
-same_length([_|T1], [_|T2]) :- same_length(T1, T2). 
 
-perms([], []). 
-perms(L, [E|PR]) :- 
-    same_length(L, [E|PR]), 
-    select(L, E, R), 
-    perms(R, PR). 
+% permutation(?List, ?Perm)
 
-permi([], []). 
-permi([H|T], P) :- 
-    same_length([H|T], P), 
-    permi(T, PT), 
-    select(P, H, PT).
-    
-perm_sel(_, _, [], []). 
-perm_sel([X|Xs], Y, [_|L], [_|R]) :- 
-    perm_sel([X|Xs], Y, L, R), 
-    select(X, Y, Z), 
-    perm_sel(Xs, Z, L, R). 
-perm_sel(X, Y) :- 
-    perm_sel(X, Y, X, Y). 
-
-perm_ins(_, _, [], []). 
-perm_ins([X|Xs], Y, [_|L], [_|R]) :- 
-    perm_ins([X|Xs], Y, L, R), 
-    perm_ins(Xs, Z), 
-    select(X, Y, Z). 
-perm_ins(X, Y) :- 
-    perm_ins(X, Y, X, Y). 
-    
+permutation([], [], []).
+permutation([H|T], L, [_|Ls]) :-
+    permutation(T, PT, Ls),
+    select(H, L, PT).
+permutation(X, Y) :-
+    permutation(X, Y, Y).

@@ -77,6 +77,6 @@ permutation1(L1, [X|L3]) :-
 
 permutation2([], []).
 permutation2([H|T], L) :-
-    permutation(T, PT),
+    permutation2(T, PT),
     select(H, L, PT).
     
