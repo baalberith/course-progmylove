@@ -143,9 +143,22 @@ reverse2(X, Y) :-
 
 % permutation(?List, ?Perm)
 
-permutation([], [], []).
-permutation([H|T], L, [_|Ls]) :-
-    permutation(T, PT, Ls),
+permutation1([], [], []).
+permutation1([H|T], L, [_|Ls]) :-
+    permutation1(T, PT, Ls),
     select(H, L, PT).
-permutation(X, Y) :-
-    permutation(X, Y, Y).
+permutation1(X, Y) :-
+    permutation1(X, Y, Y).
+
+same_length([], []). 
+same_length([_|T1], [_|T2]) :- 
+    same_length(T1,T2). 
+
+permutation2([], A, A, []). 
+permutation2(L, A, Y, [H|T]) :- 
+    same_length(L, [H|T]), 
+    select(X, L, L1), 
+    permutation2(L1, [X|A], Y, T). 
+permutation2(X, Y):- 
+    permutation2(X, [], Y, Y).
+    
