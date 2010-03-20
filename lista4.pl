@@ -1,18 +1,49 @@
+% zadanie 1
+    
+len1([], 0). 
+len1([_|A], X) :- 
+    integer(X), 
+    Y is X - 1, 
+    len1(A, Y), !. 
+len1([_|A], X) :- 
+    len1(A, Y), 
+    X is Y + 1. 
+
+len3([],0). 
+len3([_|T],N) :- 
+    len3(T,N1), 
+    N is N1 + 1. 
+
+len4([],0). 
+len4([_|T],N) :- 
+    N > 0, 
+    N1 is N - 1, 
+    len4(T,N1).
+
+len2(List,N) :- 
+    var(N),
+    len3(List,N). 
+len2(List,N) :- 
+    nonvar(N),
+    len4(List,N). 
+
+
 % zadanie 2
 
-connection(wroclaw, warszawa).
-connection(wroclaw, krakow).
-connection(wroclaw, szczecin).
-connection(szczecin, lublin).
-connection(szczecin, gniezno).
-connection(warszawa, katowice).
-connection(gniezno, gliwice).
-connection(lublin, gliwice).
-connection(gliwice, wroclaw). 
+% connection(wroclaw, warszawa).
+% connection(wroclaw, krakow).
+% connection(wroclaw, szczecin).
+% connection(szczecin, lublin).
+% connection(szczecin, gniezno).
+% connection(warszawa, katowice).
+% connection(gniezno, gliwice).
+% connection(lublin, gliwice).
+% connection(gliwice, wroclaw). 
 
-member(H, [H|_]) :- !.
-member(N, [_|T]) :- 
-    member(N, T).
+connection(a,b). 
+connection(b,c). 
+connection(c,d). 
+connection(d,c).
 
 trip(X, Y, [X, Y], _) :- 
     connection(X, Y). 
@@ -23,6 +54,32 @@ trip(X, Y, [X|R], L) :-
     trip(Z, Y, R, [Z|L]).
 trip(X, Y, R) :- 
     trip(X, Y, R, [X]). 
+    
+    
+% zadanie 3
+
+comb([0], 1).
+comb([1], 1).
+comb([0|T], N) :-
+    N > 1,
+    N1 is N - 1,
+    comb(T, N1).
+comb([1|T], N) :-
+    N > 1,
+    N1 is N - 1,
+    comb(T, N1).
+    
+bin([1|T], N) :-
+    N1 is N - 1,
+    comb(T, N1).
+bin(T, N) :-
+    N2 is N + 1,
+    bin(T, N2).
+    
+bin([0]).
+bin([1]).
+bin(X) :-
+    bin(X, 2).
     
     
 % zadanie 4
@@ -57,7 +114,7 @@ mktree([H|T],Tree) :-
     mktree(T,Bef), 
     insert(H,Bef,Tree).
 
-treesort(L,S) :- 
+treesort1(L,S) :- 
     mktree(L,T), 
     flatten(T,S). 
     
@@ -72,16 +129,11 @@ treesort2(L, S) :-
 
 % zadanie 6
 
-sublist([],[]). 
-sublist([H|S],[H|T]) :- 
-    sublist(S,T). 
-sublist([_|S],T) :- 
-    sublist(S,T). 
-
-digit(A) :- 
-    member(A,[0,1,2,3,4,5,6,7,8,9]). 
-positive(A) :- 
-    member(A,[1,2,3,4,5,6,7,8,9]). 
+sublist([], []). 
+sublist([H|T], [H|S]) :- 
+    sublist(T, S). 
+sublist([_|T], S) :- 
+    sublist(T, S). 
 
 concat_number([], A, A).
 concat_number([H|T], A, R) :-
@@ -90,68 +142,14 @@ concat_number([H|T], A, R) :-
 concat_number(D, N) :-
     concat_number(D, 0, N).
     
-select(H, [H|T], T).
-select(X, [H|T], [H|S]) :-
-   select(X, T, S).
-   
-permutation1([], [], []).
-permutation1([H|T], L, [_|Ls]) :-
-    permutation1(T, PT, Ls),
-    select(H, L, PT).
-permutation1(X, Y) :-
-    permutation1(X, Y, Y).
+solve(A, C, E, P, R, S, U) :-
+    length(Nums, 7),
+    sublist([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], Nums), 
+    permutation(Nums, [A, C, E, P, R, S, U]), 
+    U \= 0, P \= 0, 
+    concat_number([U, S, A], USA), 
+    concat_number([U, S, S, R], USSR), 
+    concat_number([P, E, A, C, E], PEACE), 
+    PEACE is USA + USSR.
 
-link(Vars,P) :- 
-    sublist([0,1,2,3,4,5,6,7,8,9],X), 
-    length(Vars,N), 
-    length(X,N), 
-    permutation(P,X). 
-
-solve(Vars, P1, P2, R, S1, S2) :- 
-    link(Vars,Perm), 
-    Vars = Perm, 
-    not(S1 = 0), 
-    not(S2 = 0), 
-    concat_number(P1,X), 
-    concat_number(P2,Y), 
-    Z is X + Y, 
-    concat_number(R,Z). 
-    
-solve2(A,C,E,P,R,S,U) :- 
-    L = [0,1,2,3,4,5,6,7,8,9], 
-    permutation(L,[U,S,A,R,P,E,C,_,_,_]), 
-    U \= 0, 
-    P \= 0, 
-    concat_number([U,S,A],USA), 
-    concat_number([U,S,S,R],USSR), 
-    concat_number([P,E,A,C,E],PEACE), 
-    PEACE is USA + USSR,
-    !.
-    
-solve3(A,C,E,P,R,S,U) :- 
-    CYFRY = [0,1,2,3,4,5,6,7,8,9], 
-    sublist(CYFRY,C7), 
-    length(C7,7), 
-    permutation(C7,[A,C,E,P,R,S,U]), 
-    U \= 0, 
-    P \= 0, 
-    concat_number([U,S,A],USA), 
-    concat_number([U,S,S,R],USSR), 
-    concat_number([P,E,A,C,E],PEACE), 
-    PEACE is USA + USSR, 
-    !.
-    
-solve4(A,C,E,P,R,S,U) :- 
-    CYFRY = [0,1,2,3,4,5,6,7,8,9], 
-    sublist(CYFRY, [A1,A2,A3,A4,A5,A6,A7]), 
-    permutation([A1,A2,A3,A4,A5,A6,A7], [A,C,E,P,R,S,U]), 
-    U \= 0, 
-    P \= 0, 
-    concat_number([U,S,A],USA), 
-    concat_number([U,S,S,R],USSR), 
-    concat_number([P,E,A,C,E],PEACE), 
-    PEACE is USA + USSR, 
-    !.
-
-% solve([A,C,E,P,R,S,U],[U,S,A],[U,S,S,R],[P,E,A,C,E],U,P).
-% solve(A,C,E,P,R,S,U).
+% solve2(A, C, E, P, R, S, U).
