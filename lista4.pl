@@ -1,55 +1,63 @@
 % zadanie 1
     
 len1([], 0). 
-len1([_|A], X) :- 
-    integer(X), 
-    Y is X - 1, 
-    len1(A, Y), !. 
-len1([_|A], X) :- 
-    len1(A, Y), 
-    X is Y + 1. 
+len1([_|T], N) :- 
+    integer(N), 
+    N1 is N - 1, 
+    len1(T, N1), !. 
+len1([_|T], N1) :- 
+    len1(T, N), 
+    N1 is N + 1. 
 
-len3([],0). 
-len3([_|T],N) :- 
-    len3(T,N1), 
-    N is N1 + 1. 
+len3([], 0). 
+len3([_|T], N1) :- 
+    len3(T, N), 
+    N1 is N + 1. 
 
-len4([],0). 
-len4([_|T],N) :- 
+len4([], 0). 
+len4([_|T], N) :- 
     N > 0, 
     N1 is N - 1, 
-    len4(T,N1).
+    len4(T, N1).
 
-len2(List,N) :- 
+len2(L, N) :- 
     var(N),
-    len3(List,N). 
-len2(List,N) :- 
+    len3(L, N). 
+len2(L, N) :- 
     nonvar(N),
-    len4(List,N). 
+    len4(L, N). 
+
+length2([], A, A). 
+length2([_|T], A, N):- 
+    \+ A == N, 
+    A1 is A + 1, 
+    length2(T, A1, N). 
+length2(L, N):- 
+    length2(L, 0, N). 
 
 
 % zadanie 2
 
-% connection(wroclaw, warszawa).
-% connection(wroclaw, krakow).
-% connection(wroclaw, szczecin).
-% connection(szczecin, lublin).
-% connection(szczecin, gniezno).
-% connection(warszawa, katowice).
-% connection(gniezno, gliwice).
-% connection(lublin, gliwice).
-% connection(gliwice, wroclaw). 
+connection(wroclaw, warszawa).
+connection(wroclaw, krakow).
+connection(wroclaw, szczecin).
+connection(szczecin, lublin).
+connection(szczecin, gniezno).
+connection(warszawa, katowice).
+connection(gniezno, gliwice).
+connection(lublin, gliwice).
+connection(gliwice, wroclaw). 
 
-connection(a,b). 
-connection(b,c). 
-connection(c,d). 
-connection(d,c).
+% connection(a,b). 
+% connection(b,c). 
+% connection(c,d). 
+% connection(d,c).
 
 trip(X, Y, [X, Y], _) :- 
     connection(X, Y). 
 trip(X, Y, [X|R], L) :- 
-    connection(X, Z),
     \+ X == Y,
+    connection(X, Z),
     \+ member(Z, L), 
     trip(Z, Y, R, [Z|L]).
 trip(X, Y, R) :- 
@@ -58,73 +66,153 @@ trip(X, Y, R) :-
     
 % zadanie 3
 
-comb([0], 1).
-comb([1], 1).
-comb([0|T], N) :-
+comb1([0], 1).
+comb1([1], 1).
+comb1([0|T], N) :-
     N > 1,
     N1 is N - 1,
-    comb(T, N1).
-comb([1|T], N) :-
+    comb1(T, N1).
+comb1([1|T], N) :-
     N > 1,
     N1 is N - 1,
-    comb(T, N1).
+    comb1(T, N1).
     
-bin([1|T], N) :-
+bin1([1|T], N) :-
     N1 is N - 1,
-    comb(T, N1).
-bin(T, N) :-
+    comb1(T, N1).
+bin1(T, N) :-
     N2 is N + 1,
-    bin(T, N2).
+    bin1(T, N2).
     
-bin([0]).
-bin([1]).
-bin(X) :-
-    bin(X, 2).
+bin1([0]).
+bin1([1]).
+bin1(X) :-
+    bin1(X, 2).
+    
+comb2([0], []). 
+comb2([1], []). 
+comb2([0|R], [_|T]) :-
+    comb2(R, T). 
+comb2([1|R], [_|T]) :-
+    comb2(R, T). 
+    
+bin2([1|T], [_|S]) :-
+    comb2(T, S).
+bin2(T, S) :-
+    bin2(T, [_|S]).
+    
+bin2([0]).
+bin2([1]).
+bin2(X) :-
+    bin2(X, [_]).
+    
+single_bin(0). 
+single_bin(1). 
+
+bin_with_zero(A, A). 
+bin_with_zero(R, A) :- 
+    bin_with_zero(R, [B|A]), 
+    single_bin(B). 
+    
+bin3([0]). 
+bin3([1|T]) :- 
+    bin_with_zero(T, []). 
+    
+rinc([], [1]). 
+rinc([0|T], [1|T]). 
+rinc([1|T], [0|T1]) :- 
+    rinc(T, T1). 
+
+rbin1([0]). 
+rbin1(X) :- 
+    rbin1(Z), 
+    rinc(Z, X). 
+    
+list([_]). 
+list([_|Y]) :- 
+    list(Y). 
+    
+fill([]). 
+fill([X|Xs]) :- 
+    (X = 0; 
+    X = 1), 
+    fill(Xs).
+
+bin([0]). 
+bin([1]). 
+bin([1|X]) :- 
+    list(X),
+    fill(X). 
+
+rfill([1]). 
+rfill([X|Xs]) :- 
+    rfill(Xs), 
+    (X = 0; 
+    X = 1). 
+
+rbin([0]).
+rbin(X) :- 
+    list(X),
+    rfill(X).
     
     
 % zadanie 4
 
 mirror(leaf, leaf). 
-mirror(node(A,D,B), node(B2,D,A2)) :- 
-    mirror(A,A2), 
-    mirror(B,B2). 
+mirror(node(L, N, R), node(L1, N, R1)) :- 
+    mirror(L, L1), 
+    mirror(R, R1). 
 
-flatten(leaf, []). 
-flatten(node(A,D,B), ACC) :- 
-    flatten(A,AD), 
-    flatten(B,BD), 
-    append(AD,[D|BD],ACC).
+flatten1(leaf, []). 
+flatten1(node(L, N, R), A) :- 
+    flatten1(L, LN), 
+    flatten1(R, RN), 
+    append(LN, [N|RN], A).
     
+flatten2(leaf, A, A). 
+flatten2(node(LT, N, RT), L1, A) :- 
+    flatten2(RT, L, A),
+    flatten2(LT, L1, [N|L]). 
+flatten2(T, L) :- 
+    flatten2(T, L, []). 
+    
+flatten3(leaf, L, L). 
+flatten3(node(L, N, R), H, T):- 
+    flatten3(L, H, [N|M]), 
+    flatten3(R, M, T). 
+flatten3(T, L) :- 
+    flatten3(T, L, []). 
+ 
 % mirror(node(leaf, 3, node(leaf, 5, leaf)), X).
 % flatten(node(leaf, 3, node(leaf, 5, leaf)), X).
 
 
 % zadanie 5
 
-insert(X, leaf, node(leaf,X,leaf)). 
-insert(X, node(A,D,B),node(AP,D,B)) :- 
-    X =< D, 
-    insert(X,A,AP). 
-insert(X, node(A,D,B),node(A,D,BP)) :- 
-    X > D, 
-    insert(X,B,BP). 
+insert(N, leaf, node(leaf, N, leaf)). 
+insert(N, node(LT, D, RT), node(LT1, D, RT)) :- 
+    N =< D, 
+    insert(N, LT, LT1). 
+insert(N, node(LT, D, RT), node(LT, D, RT1)) :- 
+    N > D, 
+    insert(N, RT, RT1). 
     
 mktree([],leaf). 
-mktree([H|T],Tree) :- 
-    mktree(T,Bef), 
-    insert(H,Bef,Tree).
+mktree([H|T], Tree) :- 
+    mktree(T, TT), 
+    insert(H, TT, Tree).
 
 treesort1(L,S) :- 
-    mktree(L,T), 
-    flatten(T,S). 
+    mktree(L, T), 
+    flatten(T, S). 
     
 treesort2([], D, D). 
-treesort2([H|T], D, W) :- 
+treesort2([H|T], D, R) :- 
     insert(H, D, D1), 
-    treesort2(T, D1, W). 
+    treesort2(T, D1, R). 
 treesort2(L, S) :- 
-    treesort2(L, leaf, W), 
-    flatten(W, S). 
+    treesort2(L, leaf, R), 
+    flatten(R, S). 
 
 
 % zadanie 6
