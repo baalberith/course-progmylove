@@ -34,6 +34,16 @@ length2([_|T], A, N):-
     length2(T, A1, N). 
 length2(L, N):- 
     length2(L, 0, N). 
+    
+length3([], A, A). 
+length3([_|T], A, N):- 
+    (var(N) -> 
+        true;
+        A < N),
+    A1 is A + 1, 
+    length3(T, A1, N). 
+length3(L, N):- 
+    length3(L, 0, N).
 
 
 % zadanie 2
@@ -62,6 +72,15 @@ trip(X, Y, [X|R], L) :-
     trip(Z, Y, R, [Z|L]).
 trip(X, Y, R) :- 
     trip(X, Y, R, [X]). 
+    
+trip2(P, T, T) :-
+    T = [P|_].
+trip2(P, T, [H|A]) :-
+    connection(X, H),
+    \+ member(X, A),
+    trip2(P, T, [X,H|A]).
+trip2(P, K, T) :-
+    trip2(P, T, [K]).
     
     
 % zadanie 3
@@ -155,6 +174,27 @@ rbin(X) :-
     list(X),
     rfill(X).
     
+digit(0).
+digit(1).
+
+xrbin1([1]).
+xrbin1([D|X]) :-
+    xrbin1(X),
+    digit(D).
+    
+xrbin([0]).
+xrbin(X) :-
+    xrbin1(X).
+    
+xbin(A, A).
+xbin(X, A) :-
+    xbin(X, [D|A]),
+    digit(D).
+    
+xbin([0]).
+xbin([1|X]) :-
+    xbin(X, []).
+    
     
 % zadanie 4
 
@@ -189,13 +229,13 @@ flatten3(T, L) :-
 
 % zadanie 5
 
-insert(N, leaf, node(leaf, N, leaf)). 
-insert(N, node(LT, D, RT), node(LT1, D, RT)) :- 
-    N =< D, 
-    insert(N, LT, LT1). 
-insert(N, node(LT, D, RT), node(LT, D, RT1)) :- 
-    N > D, 
-    insert(N, RT, RT1). 
+insert(D, leaf, node(leaf, D, leaf)). 
+insert(D, node(LT, N, RT), node(LT1, N, RT)) :- 
+    D =< N, 
+    insert(D, LT, LT1). 
+insert(D, node(LT, N, RT), node(LT, N, RT1)) :- 
+    D > N, 
+    insert(D, RT, RT1). 
     
 mktree([],leaf). 
 mktree([H|T], Tree) :- 
@@ -240,4 +280,4 @@ solve(A, C, E, P, R, S, U) :-
     concat_number([P, E, A, C, E], PEACE), 
     PEACE is USA + USSR.
 
-% solve2(A, C, E, P, R, S, U).
+% solve(A, C, E, P, R, S, U).

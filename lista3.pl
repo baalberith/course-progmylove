@@ -12,23 +12,23 @@ filter([H|T], S) :-
     
 % count(+Elem, +List, ?Count)
 
-count(_, [], 0).
-count(H, [H|T], N2) :-
-    count(H, T, N),
+count1(_, [], 0).
+count1(H, [H|T], N2) :-
+    count1(H, T, N),
     N2 is N + 1.
-count(E, [H|T], N) :-
+count1(E, [H|T], N) :-
     E \= H,
-    count(E, T, N).
+    count1(E, T, N).
     
-count2(E, L, Count):- 
-    count2(E, L, 0, Count). 
 count2(_, [], Curr, Curr). 
-count(E, [E|T], Curr, Count) :- 
+count2(E, [E|T], Curr, Count) :- 
     Curr1 is Curr + 1, 
     count2(E, T, Curr1, Count). 
-count(E, [H|T], Curr, Count):- 
+count2(E, [H|T], Curr, Count):- 
     E \= H, 
     count2(E, T, Curr, Count).
+count2(E, L, Count):- 
+    count2(E, L, 0, Count). 
     
 % exp(+Base, +Exp, ?Res)
 
@@ -40,6 +40,15 @@ exp(B, N, A, R) :-
     exp(B, N2, A2, R).
 exp(B, E, R) :-
     exp(B, E, 1, R).
+    
+fexp(_, 0, 1).
+fexp(B, E, R) :-
+    E > 0,
+    F is E //2,
+    fexp(B, F, Q),
+    (E mod 2 =:= 0 ->
+        R is Q * Q;
+        R is Q * Q * B).
     
     
 % zadanie 2
@@ -64,13 +73,12 @@ factorial2(N, M) :-
 
 % concat_number(+Digits, ?Num)
 
-concat_number([N], A, R) :- 
-    R is 10 * A + N, !.
+concat_number([], A, A).
 concat_number([H|T], A, R) :-
     A2 is 10 * A + H,
     concat_number(T, A2, R).
-concat_number(D, N) :-
-    concat_number(D, 0, N).
+concat_number([H|T], N) :-
+    concat_number(T, H, N).
 
 % decimal(+Num, ?Digits) 
 
@@ -97,6 +105,16 @@ select_min([H|T], H, [M|R]) :-
 select_min([H|T], M, [H|R]) :-
     select_min(T, M, R),
     H > M.
+    
+sel_min([], A1, A1, A2, A2).
+sel_min([H|T], A1, M, A2, R) :-
+    H >= A1,
+    sel_min(T, A1, M, [H|A2], R).
+sel_min([H|T], A1, M, A2, R) :-
+    H < A1,
+    sel_min(T, H, M, [A1|A2], R).
+sel_min([H|T], M, R) :-
+    sel_min(T, H, M, [], R).
     
 sel_sort([], []). 
 sel_sort(L, [H|T]) :- 
@@ -161,4 +179,18 @@ permutation2(L, A, Y, [H|T]) :-
     permutation2(L1, [X|A], Y, T). 
 permutation2(X, Y):- 
     permutation2(X, [], Y, Y).
+    
+sel(X, [X|Ys], Ys, _). 
+sel(X, [Y|Rs], [Y|Ys], [_|Xs]):- 
+  sel(X, Rs, Ys, Xs). 
+  
+perm1([], []).
+perm1(L1, [X|L3]) :-
+    sel(X, L1, L2, _),
+    perm1(L2, L3).
+    
+perm2([], []).
+perm2([H|T], L) :-
+    perm2(T, PT),
+    sel(H, L, PT, _).
     
