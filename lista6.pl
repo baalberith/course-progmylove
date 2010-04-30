@@ -5,23 +5,17 @@ plus(X, Y, Z) :-
 minus(X, Y, Z) :-
     Z is X - Y.
     
-n(0).
-n(X) :-
-    n(X, 0).
-n(X, N) :-
-    N =< 0,
-    X is (-1) * N + 1.
-n(X, N) :-
+i(X) :-
+    i(X, 0).
+i(N, N).
+i(X, N) :-
     N =< 0,
     M is (-1) * N + 1,
-    n(X, M).
-n(X, N) :-
-    N > 0,
-    X is (-1) * N.
-n(X, N) :-
+    i(X, M).
+i(X, N) :-
     N > 0,
     M is (-1) * N,
-    n(X, M).
+    i(X, M).
     
 sum(X, Y, Z) :-
     nonvar(X),
@@ -36,33 +30,27 @@ sum(X, Y, Z) :-
     nonvar(Z), !,
     minus(Z, Y, X).
 sum(X, Y, Z) :-
-    nonvar(Z), !,
-    n(X),
-    minus(Z, X, Y).
-sum(X, Y, Z) :-
     nonvar(X), !,
-    n(Y),
-    plus(X, Y, Z).
+    i(Y),
+    sum(X, Y, Z).
 sum(X, Y, Z) :-
     nonvar(Y), !,
-    n(X),
-    plus(X, Y, Z).
+    i(X),
+    sum(X, Y, Z).
 sum(X, Y, Z) :-
-    n(X), 
-    n(Y),
-    plus(X, Y, Z).
+    nonvar(Z), !,
+    i(X),
+    sum(X, Y, Z).
+sum(X, Y, Z) :-
+    i(X), 
+    i(Y),
+    sum(X, Y, Z).
     
     
 % zadanie 2
 
 app(H1-H2, H2-T2, H1-T2).
-    
-find_next(P, N, N) :-
-    is_prime(P, N), !.
-find_next(P, N, M) :-
-    N1 is N + 1,
-    find_next(P, N1, M).
-    
+
 is_prime(X-Y, _) :- 
     X == Y, !.
 is_prime([P|Ps]-Y, N) :-
@@ -70,12 +58,21 @@ is_prime([P|Ps]-Y, N) :-
     R \= 0,
     is_prime(Ps-Y, N).
 
-prime(2).
+find_next(P, N, N) :-
+    is_prime(P, N), !.
+find_next(P, N, M) :-
+    N1 is N + 1,
+    find_next(P, N1, M).
+
 prime(N) :-
     prime([2|Y]-Y, 2, N).
-prime(Primes, P, N) :-
+prime(_, P, P).
+prime(Primes, P, M) :-
+    nonvar(M), !, P < M,
     NextPrime is P + 1,
-    find_next(Primes, NextPrime, N).
+    find_next(Primes, NextPrime, N),
+    app(Primes, [N|Z]-Z, Ps),
+    prime(Ps, N, M).
 prime(Primes, P, M) :-
     NextPrime is P + 1,
     find_next(Primes, NextPrime, N),
@@ -156,49 +153,66 @@ dfs2(P) :-
     dfs2(S, [S], Path),
     reverse(Path, P).
     
-dfs(Path) :-
-    start(V),
+dfs(V, Path) :-
     empty1(S),
     put1(V, S, Stack),
-    dfs(Stack, Path).
+    dfs(Stack, [], Path).
     
-dfs(Stack, []) :-
+dfs(Stack, _, []) :-
     empty1(Stack), !.
-dfs(Stack, [V|Path]) :-
+dfs(Stack, Visited, [V|Path]) :-
     get1(Stack, V, St),
+    \+ member(V, Visited), !,
     addall1(V1, e(V, V1), St, S),
-    dfs(S, Path).
+    dfs(S, [V|Visited], Path).
+dfs(Stack, Visited, Path) :-
+    get1(Stack, _, St),
+    dfs(St, Visited, Path).
     
-bfs(Path) :-
-    start(V),
+path1(V1, V2, Path) :-
+    empty(S),
+    put1(V1, S, Stack),
+    path1(Stack, V2, [], Path).
+    
+path1(Stack, V2, _, [V2]) :-
+    \+ empty(Stack),
+    get1(Stack, V, _),
+    V = V2.
+path1(Stack, V2, Visited, [V|Path]) :-
+    \+ empty(Stack),
+    get1(Stack, V, St),
+    \+ member(V, Visited), !,
+    addall1(V1, e(V, V1), St, S),
+    path1(S, V2, [V|Visited], Path).
+path1(Stack, V2, Visited, Path) :-
+    \+ empty(Stack),
+    get1(Stack, _, St),
+    path1(St, V2, Visited, Path).
+    
+bfs(V, Path) :-
     empty2(Q),
     put2(V, Q, Queue),
-    bfs(Queue, Path).
+    bfs(Queue, [], Path).
     
-bfs(Queue, []) :-
+bfs(Queue, _, []) :-
     is_empty2(Queue), !.
-bfs(Queue, [V|Path]) :-
-    get2(Queue, V, Qu),
-    addall2(V1, e(V, V1), Qu, Q),
-    bfs(Q, Path).
-    
-bfs2(Path) :-
-    start(V),
-    empty2(Q),
-    put2(V, Q, Queue),
-    bfs2(Queue, [], Path).
-    
-bfs2(Queue, _, []) :-
-    is_empty2(Queue), !.
-bfs2(Queue, Visited, [V|Path]) :-
+bfs(Queue, Visited, [V|Path]) :-
     get2(Queue, V, Qu),
     \+ member(V, Visited), !,
     addall2(V1, e(V, V1), Qu, Q),
-    bfs2(Q, [V|Visited], Path).
-bfs2(Queue, Visited, [V|Path]) :-
-    get2(Queue, V, Qu),
-    member(V, Visited), !,
-    bfs2(Qu, Visited, Path).
+    bfs(Q, [V|Visited], Path).
+bfs(Queue, Visited, Path) :-
+    get2(Queue, _, Qu),
+    bfs(Qu, Visited, Path).
+    
+trip2(P, T, T) :-
+    T = [P|_].
+trip2(P, T, [H|A]) :-
+    e(X, H),
+    \+ member(X, A),
+    trip2(P, T, [X,H|A]).
+trip2(P, K, T) :-
+    trip2(P, T, [K]).  
     
     
 % zadanie 5
