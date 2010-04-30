@@ -1,4 +1,4 @@
-% Ilona Koda
+% I**** K***
 % zadanie 1 wersja 0
 % łamigłówka A, B, C
 
