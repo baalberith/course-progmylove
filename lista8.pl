@@ -1,46 +1,3 @@
-% zadanie 0
-
-digit(0) --> "0".
-digit(1) --> "1".
-digit(2) --> "2".
-digit(3) --> "3".
-digit(4) --> "4".
-digit(5) --> "5".
-digit(6) --> "6".
-digit(7) --> "7".
-digit(8) --> "8".
-digit(9) --> "9".
-
-number(N) -->
-    digit(D),
-    number(N, D).
-number(N, A) -->
-    digit(D), !,
-    { A1 is 10 * A + D },
-    number(N, A1).
-number(N, N) --> "".
-
-expr(N) --> 
-    number(A), 
-    expr(N, A).
-expr(N, A) -->
-    "-", !,
-    number(N1),
-    { A1 is A - N1 },
-    expr(N, A1).
-expr(N, N) --> "".
-
-% prawostronna łączność
-expr1(N) --> number(N).
-expr1(N) --> number(N1), "-", expr1(N2),
-    { N is N1 - N2 }.
-    
-% zapętla się po nawrocie
-expr2(N) --> number(N).
-expr2(N) --> expr2(N1), "-", number(N2),
-    { N is N1 - N2 }.
-
-
 % zadanie 3
 
 '!'(N, M) :-
@@ -158,3 +115,15 @@ e(Abs, [E, '(' | A]) -->
     e(Abs, [E | A]). 
 e(E2 * E1, [E1, *, E2]) --> !. 
 e(Abs, [Abs]) --> "". 
+
+variable(a) --> "a".
+variable(b) --> "b".
+
+ex(X) --> ex(X, []). 
+ex(X, [variable(R), *, variable(L)|A]) --> !, ex(X, [variable(*(L, R))|A]). 
+ex(X, A) --> "a", !, ex(X, [variable(a)|A]). 
+ex(X, A) --> "b", !, ex(X, [variable(b)|A]). 
+ex(X, A) --> "*", !, ex(X, [*|A]). 
+ex(X, A) --> "(", !, ex(X, ['()'|A]). 
+ex(X, [variable(E), '()'|A]) --> ")", !, ex(X, [variable(E)|A]). 
+ex(X, [variable(X)]) --> "".

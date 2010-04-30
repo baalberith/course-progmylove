@@ -118,40 +118,9 @@ collect2(A, A).
 
 % zadanie 4
 
-e(1, 2).
-e(1, 3).
-e(1, 5).
-e(2, 4).
-e(3, 5).
-e(3, 6).
-e(4, 5).
-e(5, 6).
-e(5, 7).
-
-start(1).
-goal(7).
-
-dfs1(V, [V]) :-
-    goal(V), !.
-dfs1(V, [V|Rest]) :-
-    e(V, V2),
-    dfs1(V2, Rest).
-    
-dfs1(R) :-
-    start(S),
-    dfs1(S, R).
-    
-dfs2(S, Path, Path) :-
-    goal(S).
-dfs2(S, Visited, Path) :-
-    e(S, S2),
-    \+ member(S2, Visited),
-    dfs2(S2, [S2|Visited], Path).
-    
-dfs2(P) :-
-    start(S),
-    dfs2(S, [S], Path),
-    reverse(Path, P).
+e(1, 2). e(1, 3). e(1, 5).
+e(2, 4). e(3, 5). e(3, 6).
+e(4, 5). e(5, 6). e(5, 7).
     
 dfs(V, Path) :-
     empty1(S),
@@ -169,26 +138,6 @@ dfs(Stack, Visited, Path) :-
     get1(Stack, _, St),
     dfs(St, Visited, Path).
     
-path1(V1, V2, Path) :-
-    empty(S),
-    put1(V1, S, Stack),
-    path1(Stack, V2, [], Path).
-    
-path1(Stack, V2, _, [V2]) :-
-    \+ empty(Stack),
-    get1(Stack, V, _),
-    V = V2.
-path1(Stack, V2, Visited, [V|Path]) :-
-    \+ empty(Stack),
-    get1(Stack, V, St),
-    \+ member(V, Visited), !,
-    addall1(V1, e(V, V1), St, S),
-    path1(S, V2, [V|Visited], Path).
-path1(Stack, V2, Visited, Path) :-
-    \+ empty(Stack),
-    get1(Stack, _, St),
-    path1(St, V2, Visited, Path).
-    
 bfs(V, Path) :-
     empty2(Q),
     put2(V, Q, Queue),
@@ -204,15 +153,6 @@ bfs(Queue, Visited, [V|Path]) :-
 bfs(Queue, Visited, Path) :-
     get2(Queue, _, Qu),
     bfs(Qu, Visited, Path).
-    
-trip2(P, T, T) :-
-    T = [P|_].
-trip2(P, T, [H|A]) :-
-    e(X, H),
-    \+ member(X, A),
-    trip2(P, T, [X,H|A]).
-trip2(P, K, T) :-
-    trip2(P, T, [K]).  
     
     
 % zadanie 5
