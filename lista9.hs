@@ -1,16 +1,18 @@
+import Data.List
+import Data.Char
+   
+   
 -- zadanie 2
 
 fibSum :: Integer
-fibSum = 
-    let limit = 4 * 10 ^ 6
-        fibSum' acc1 acc2 acc =
-            if acc1 > limit 
-                then acc
-            else 
-                if even acc1 
-                    then fibSum' acc2 (acc1 + acc2) (acc + acc1)
-                    else fibSum' acc2 (acc1 + acc2) acc   
-    in fibSum' 1 1 0
+fibSum = fibSum' 1 1 0 where
+    limit = 4 * 10 ^ 6
+    fibSum' fn fn1 acc
+        | fn > limit = acc
+        | otherwise = fibSum' fn1 (fn + fn1) (if even fn then acc + fn else acc)
+
+fibSum' = sum $ filter even $ takeWhile (<= 4 * 10 ^ 6) fib where
+    fib = 1 : 1 : zipWith (+) fib (tail fib)
     
 
 -- zadanie 3
@@ -28,7 +30,13 @@ maxSeqLen = maxSeqLen' limit where
         | otherwise = maxLen
         where len = seqLen n
               maxLen = maxSeqLen' (n - 1)
-                      
+              
+maxSeqLen' = maximum $ map (length . seq) [1..10^6] where
+    seq 1 = []
+    seq n = n : seq (if even n then n `div` 2 else 3 * n + 1)
+                     
+maxSeqLen'' = maximum $ map (length . unfoldr (\n -> if n == 1 then Nothing else Just (n, if even n then n `div` 2 else 3 * n + 1))) [1..10^4]
+
 
 -- zadanie 4
 
@@ -37,8 +45,13 @@ digSum = digSum' (fact number) where
     number = 100
     fact 0 = 1
     fact n = n * fact (n - 1)
-    digSum' 0 = 0
-    digSum' n = (n `mod` 10) + digSum' (n `div` 10)
+    digSum' n 
+        | n < 10 = n
+        | otherwise = (n `mod` 10) + digSum' (n `div` 10)
+        
+digSum' = sum . unfoldr (\n -> if n == 0 then Nothing else Just (n `mod` 10, n `div` 10)) $ product [1..100]
+                                  
+digSum'' = sum . map (\c -> ord c - ord '0') . show $ product [1..100]
     
  
 -- zadanie 5
@@ -47,6 +60,11 @@ iter :: (a -> a) -> a -> Integer -> a
 iter f x n = iter' f n $ x where 
     iter' _ 0 = id
     iter' f n = f . (iter' f (n - 1))
+    
+iter' f x n
+    | n < 0 = undefined
+    | n == 0 = x
+    | otherwise = f $ iter f x (n - 1)
     
 
 -- zadanie 6
