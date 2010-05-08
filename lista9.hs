@@ -64,7 +64,7 @@ iter f x n = iter' f n $ x where
 iter' f x n
     | n < 0 = undefined
     | n == 0 = x
-    | otherwise = f $ iter f x (n - 1)
+    | otherwise = f $ iter' f x (n - 1)
     
 
 -- zadanie 6
