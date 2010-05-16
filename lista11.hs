@@ -34,8 +34,8 @@ split lst = split' lst lst where
 mergesort :: Ord a => [a] -> [a] 
 mergesort []  = [] 
 mergesort [x] = [x] 
-mergesort xs  = merge (mergesort ls) (mergesort gs) 
-    where (ls, gs) = split xs 
+mergesort xs  = merge (mergesort ls) (mergesort rs) 
+    where (ls, rs) = split xs 
         
         
 -- zadanie 4
@@ -51,21 +51,18 @@ d235 = 1 : map (2*) d235 `merge'` map (3*) d235 `merge'` map (5*) d235
 
 
 -- zadanie 5
-
-mergen m xs 0 _ = take m xs
-mergen 0 _ n ys = take n ys
-mergen m xs@(x:xs') n ys@(y:ys') 
-    | x <= y    = x : mergen (m - 1) xs' n ys 
-    | otherwise = y : mergen m xs (n - 1) ys' 
-
-msortn :: Ord a => Integer -> [a] -> [a] 
-msortn 0 _ = []
-msortn 1 (x:_) = [x] 
-msortn n xs = mergen (fromInteger m) (msortn m xs) (fromInteger (n - m)) (msortn (n - m) gs) 
-    where m = n `div` 2
-          gs = drop (fromInteger m) xs 
           
+mergesortn :: Ord a => Int -> [a] -> [a] 
+mergesortn 0 _ = [] 
+mergesortn 1 (x:_) = [x] 
+mergesortn n xs = merge (mergesortn n2 xs) (mergesortn (n - n2) rs) 
+    where n2 = n `div` 2
+          rs = drop n2 xs
           
+mergesort' :: Ord a => [a] -> [a] 
+mergesort' xs = mergesortn (length xs) xs
+
+
 -- zadanie 6
 
 data Tree a = Node (Tree a) a (Tree a) | Leaf deriving Show 
