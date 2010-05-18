@@ -1,10 +1,10 @@
 -- zadanie 1
 
 nat2 :: [(Integer,Integer)]
-nat2 = [(x, y) | n <- [0..], x <- [0..n], y <- [0..n], x + y == n]
+nat2 = [(x, y) | n <- [0..], x <- [0..n], y <- [0..n-x], x + y == n]
 
 nat2' :: [(Integer,Integer)]
-nat2' = [(x, n-x) | n <- [0..], x <- [0..n]]
+nat2' = [(x, n - x) | n <- [0..], x <- [0..n]]
 
 
 -- zadanie 2
@@ -20,16 +20,16 @@ merge :: Ord a => [a] -> [a] -> [a]
 merge xs [] = xs 
 merge [] ys = ys 
 merge xs@(x:xs') ys@(y:ys') 
-    | x <= y    = x : merge xs' ys 
+    | x <= y = x : merge xs' ys 
     | otherwise = y : merge xs ys' 
  
 split :: [a] -> ([a], [a])
-split lst = split' lst lst where 
+split xs = split' xs xs where 
     split' xs [] = ([], xs) 
     split' xs [_] = ([], xs) 
     split' (x:xs) (_:_:ys) = 
-        let (a,b) = split' xs ys 
-        in (x:a, b) 
+        let (ls, rs) = split' xs ys 
+        in (x:ls, rs) 
 
 mergesort :: Ord a => [a] -> [a] 
 mergesort []  = [] 
@@ -69,14 +69,19 @@ data Tree a = Node (Tree a) a (Tree a) | Leaf deriving Show
 
 insert :: Ord a => a -> Tree a -> Tree a 
 insert x Leaf = Node Leaf x Leaf 
-insert x (Node l y r) 
-    | x < y     = Node (insert x l) y r 
-    | otherwise = Node l y (insert x r) 
+insert x (Node ls n rs) 
+    | x < n = Node (insert x ls) n rs 
+    | otherwise = Node ls n (insert x rs) 
 
 flatten :: Tree a -> [a] 
 flatten Leaf = [] 
-flatten (Node l x r) = flatten l ++ [x] ++ flatten r 
+flatten (Node ls n rs) = flatten ls ++ [n] ++ flatten rs 
+
+flatten' :: Tree a -> [a] 
+flatten' tree = aux [] tree where 
+    aux acc Leaf = acc
+    aux acc (Node ls n rs) = aux (n : aux acc rs) ls  
 
 treesort :: Ord a => [a] -> [a] 
-treesort = flatten . foldr insert Leaf 
+treesort = flatten' . foldr insert Leaf 
           
