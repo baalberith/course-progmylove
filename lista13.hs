@@ -1,4 +1,5 @@
 import Control.Monad
+import Data.Maybe
    
    
 -- zadanie 1
@@ -23,9 +24,10 @@ permi2 (x:xs) = [ p | perm <- permi3 xs, p <- insert2 x perm ]
     
 insert3 :: a -> [a] -> [[a]]
 insert3 x [] = [[x]] 
-insert3 x ys@(y:ys') = return (x:ys) `mplus` do 
-    zs <- insert3 x ys'
-    return (y:zs) 
+insert3 x ys@(y:ys') = 
+    return (x:ys) `mplus` do 
+        zs <- insert3 x ys'
+        return (y:zs) 
     
 permi3:: [a] -> [[a]] 
 permi3 [] = [[]] 
@@ -57,9 +59,10 @@ perms2 xs = [ y:perm | (y, ys) <- select2 xs, perm <- perms2 ys ]
 
 select3 :: [a] -> [(a, [a])] 
 select3 [x] = [(x, [])] 
-select3 (x:xs) = return (x, xs) `mplus` do 
-    (y, ys) <- select3 xs 
-    return (y, x:ys) 
+select3 (x:xs) = 
+    return (x, xs) `mplus` do 
+        (y, ys) <- select3 xs 
+        return (y, x:ys) 
     
 perms3:: [a] -> [[a]] 
 perms3 [] = [[]] 
@@ -91,18 +94,46 @@ sublists3:: [a]-> [[a]]
 sublists3 [] = [[]] 
 sublists3 (x:xs) = do 
     sub <- sublists3 xs 
-    return (x:sub) `mplus` return sub 
+    return (x:sub) `mplus` 
+        return sub 
 
 
 -- zadanie 4
 
-prod :: [Integer] -> Integer
-prod [] = undefined
-prod xs = 
+prod1 :: [Integer] -> Integer
+prod1 xs = 
     case prod' xs of
         Nothing -> 0
         Just n -> n
     where prod' = foldM (\acc n -> if n == 0 then Nothing else Just $ n * acc) 1
+          
+          
+prod2 :: [Integer] -> Integer   
+prod2 = fromMaybe 0 . foldM (\x y -> guard (y /= 0) >> return (x * y)) 1
+
+
+prod3 :: [Integer] -> Integer
+prod3 [] = undefined
+prod3 xs = 
+    (case result of 
+        Nothing -> 0 
+        Just n  -> n) where 
+            result = prod' (Just 1) xs 
+            prod' = foldl (\acc n  -> 
+                case acc of 
+                    Nothing -> acc 
+                    Just 0  -> Nothing 
+                    Just a  -> Just $ a * n)
+
+
+prod4 :: [Integer] -> Integer
+prod4 [] = undefined                   
+prod4 xs = fromMaybe 0 result where 
+    result = foldl aux (Just 1) xs 
+    aux acc n = do 
+        a <- acc
+        guard (n /= 0) 
+        return $ a * n
 
 
 -- zadanie 5
@@ -123,12 +154,35 @@ place i rows diag1 diag2 = do
   
 select :: (MonadPlus m) => [a] -> m (a, [a])
 select [x] = return (x, []) 
-select (x:xs) = return (x, xs) `mplus` do 
-    (y, ys) <- select xs 
-    return (y, x:ys) 
+select (x:xs) = 
+    return (x, xs) `mplus` do 
+        (y, ys) <- select xs 
+        return (y, x:ys) 
 
 
+hetmani :: Int -> [[Int]]
+hetmani n = aux n n [] where 
+    aux _ 0 board = return board 
+    aux size col board = do 
+        row <- [1..size] 
+        guard $ nieszachuje row board 
+        aux size (col-1) (row:board) 
+              
+nieszachuje :: Int -> [Int] -> Bool 
+nieszachuje row board = aux 1 board where 
+    aux _ [] = True 
+    aux n (y:ys) = 
+        y /= row && 
+        y + n /= row && 
+        y - n /= row && 
+        aux (n+1) ys 
+              
+              
 -- zadanie 6
+
+-- 1) kończy się
+-- 2) pętli się w nieskończoność
+-- 3) zużywa nieskończoną ilość pamięci na stercie lub stosie
 
 loop :: a
 loop = loop
@@ -136,11 +190,11 @@ loop = loop
 ones :: [Integer]
 ones = 1 : ones
 
-f1 = head $ 1 : loop
-f2 = fst (1, loop)
-f3 = length [loop, loop, loop]
-f4 = length ones
-f5 = sum ones
-f6 = last ones
-f7 = last [1..]
-f8 = let f [] = 0; f (_:xs) = 2 + f xs in f ones
+f1 = head $ 1 : loop -- 1)
+f2 = fst (1, loop) -- 1)
+f3 = length [loop, loop, loop] -- 1)
+f4 = length ones -- 2)
+f5 = sum ones -- 3)
+f6 = last ones -- 2)
+f7 = last [1..] -- 3)
+f8 = let f [] = 0; f (_:xs) = 2 + f xs in f ones -- 3)
