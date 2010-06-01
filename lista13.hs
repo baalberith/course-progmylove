@@ -19,18 +19,18 @@ insert2 x ys@(y:ys') = (x:ys) : [ y:zs | zs <- insert2 x ys' ]
 
 permi2:: [a] -> [[a]] 
 permi2 [] = [[]] 
-permi2 (x:xs) = [ p | perm <- permi3 xs, p <- insert2 x perm ]
+permi2 (x:xs) = [ p | perm <- permi2 xs, p <- insert2 x perm ]
     
     
 insert3 :: a -> [a] -> [[a]]
-insert3 x [] = [[x]] 
+insert3 x [] = return [x] 
 insert3 x ys@(y:ys') = 
     return (x:ys) `mplus` do 
         zs <- insert3 x ys'
         return (y:zs) 
     
 permi3:: [a] -> [[a]] 
-permi3 [] = [[]] 
+permi3 [] = return [] 
 permi3 (x:xs) = do 
     perm <- permi3 xs 
     insert3 x perm 
@@ -58,14 +58,14 @@ perms2 xs = [ y:perm | (y, ys) <- select2 xs, perm <- perms2 ys ]
 
 
 select3 :: [a] -> [(a, [a])] 
-select3 [x] = [(x, [])] 
+select3 [x] = return (x, []) 
 select3 (x:xs) = 
     return (x, xs) `mplus` do 
         (y, ys) <- select3 xs 
         return (y, x:ys) 
     
 perms3:: [a] -> [[a]] 
-perms3 [] = [[]] 
+perms3 [] = return []
 perms3 xs = do 
     (y, ys) <- select3 xs 
     perm <- perms3 ys 
@@ -91,7 +91,7 @@ sublists2 (x:xs) = [ s | sub <- sublists2 xs, s <- [x:sub, sub] ]
 
 
 sublists3:: [a]-> [[a]] 
-sublists3 [] = [[]] 
+sublists3 [] = return [] 
 sublists3 (x:xs) = do 
     sub <- sublists3 xs 
     return (x:sub) `mplus` 
@@ -141,18 +141,18 @@ prod4 xs = fromMaybe 0 result where
 queens :: Int -> [[Int]]
 queens n = place n [1..n] [] []
 
-place :: (MonadPlus m) => Int -> [Int] -> [Int] -> [Int] -> m [Int]
+place :: Int -> [Int] -> [Int] -> [Int] -> [[Int]]
 place 0 _ _ _ = return []
-place i rows diag1 diag2 = do
+place col rows diag1 diag2 = do
     (row, rows') <- select rows
-    let d1 = row - i
+    let d1 = row - col
     guard (d1 `notElem` diag1)
-    let d2 = row + i
+    let d2 = row + col
     guard (d2 `notElem` diag2)
-    rest <- place (i-1) rows' (d1:diag1) (d2:diag2)
+    rest <- place (col-1) rows' (d1:diag1) (d2:diag2)
     return (row:rest)
   
-select :: (MonadPlus m) => [a] -> m (a, [a])
+select :: [a] -> [(a, [a])]
 select [x] = return (x, []) 
 select (x:xs) = 
     return (x, xs) `mplus` do 
