@@ -1,6 +1,6 @@
 -- zadanie 1 
 
-data Cyclist a = Elem (Cyclist a) a (Cyclist a) deriving Show
+data Cyclist a = Elem (Cyclist a) a (Cyclist a) 
 
                           
 fromList :: [a] -> Cyclist a
@@ -10,7 +10,7 @@ fromList xs =
     in first 
 
 makeList :: Cyclist a -> [a] -> Cyclist a -> (Cyclist a, Cyclist a)
-makeList prev ([x]) next = 
+makeList prev [x] next = 
     let this = Elem prev x next 
     in (this, this) 
 makeList prev (x:xs) next = 
@@ -30,7 +30,7 @@ backward (Elem prev _ _) = prev
 
 
 ex1 :: Integer
-ex1 = label . forward . forward . forward . backward . forward . forward $ fromList [1,2,3]
+ex1 = label . forward . forward . forward . backward . forward . forward $ fromList [1, 2, 3]
 
 
 -- zadanie 2 
@@ -132,7 +132,7 @@ ex4 = runRandom 0 $ do
 
 -- zadanie 5
 
-newtype SSC a = SSC (String -> (a,String)) 
+newtype SSC a = SSC (String -> (a, String)) 
 
 instance Monad SSC where 
     (SSC comp) >>= f =    
@@ -157,16 +157,14 @@ isEOS = SSC (\str -> let val = null str in (val, str))
 
 
 countLines :: String -> Int 
-countLines = runSSC $ lines' 0
-
-lines' :: Int -> SSC Int 
-lines' n = do 
-    eos <- isEOS 
-    if eos 
-        then return n 
-        else do 
-            ch <- getc 
-            lines' (if ch == '\n' then n + 1 else n) 
+countLines = runSSC $ lines 0 where
+    lines n = do 
+        eos <- isEOS 
+        if eos 
+            then return n 
+            else do 
+                ch <- getc 
+                lines (if ch == '\n' then n + 1 else n) 
 
 
 ex5 = countLines "ala ma kota,\n a ola ma psa\n" 
